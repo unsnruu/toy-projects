@@ -1,56 +1,27 @@
 import styled from "@emotion/styled";
-import React, { useState, useEffect } from "react";
 
-interface Element {
-  id: number;
-  isVisible: boolean;
-  isMounted: boolean;
-}
-const initElements: Element[] = Array.from({ length: 9 }, (v, idx) => ({
-  id: idx,
-  isMounted: false,
-  isVisible: false,
-}));
-initElements[0].isMounted = true;
-initElements[0].isVisible = true;
+import { Element } from "./DnDContainer";
 
 const GraphWrapper = styled.div`
   width: 310px;
   height: 310px;
+  padding: 2rem;
+  border: 1px solid black;
 `;
-
-function DNDGraph() {
-  const [elements, setElements] = useState<Element[]>(initElements);
-
-  //Event Handlers
-  const handleDragEnter =
-    (id: Number) => (event: React.DragEvent<HTMLDivElement>) => {
-      console.log(`Entered on element ${id}`);
-
-      const newElements = elements.map((elem) => {
-        if (elem.id === id && !elem.isMounted) {
-          elem.isVisible = true;
-        }
-        return elem;
-      });
-      setElements((prev) => newElements);
-    };
-
-  const handleDragLeave =
-    (id: Number) => (event: React.DragEvent<HTMLDivElement>) => {
-      console.log(`Leave on element ${id}`);
-
-      const newElements = elements.map((elem) => {
-        if (elem.id === id && !elem.isMounted) {
-          elem.isVisible = false;
-        }
-        return elem;
-      });
-      setElements((prev) => newElements);
-    };
-
+interface DnDGraphProps {
+  elements: Element[];
+  handleDragEnter: (id: Number) => (e: React.DragEvent<HTMLDivElement>) => void;
+  handleDragLeave: (id: Number) => (e: React.DragEvent<HTMLDivElement>) => void;
+  handleDragLeaveOuter: (e: React.DragEvent<HTMLDivElement>) => void;
+}
+function DnDGraph({
+  elements,
+  handleDragEnter,
+  handleDragLeave,
+  handleDragLeaveOuter,
+}: DnDGraphProps) {
   return (
-    <GraphWrapper>
+    <GraphWrapper onDragLeave={handleDragLeaveOuter}>
       {elements.map(({ id, isMounted, isVisible }) => (
         <GraphElement
           id={id}
@@ -65,7 +36,7 @@ function DNDGraph() {
   );
 }
 
-export default DNDGraph;
+export default DnDGraph;
 
 interface GraphElementProps extends Element {
   handleDragEnter: (e: React.DragEvent<HTMLDivElement>) => void;
@@ -77,7 +48,7 @@ const StyledDiv = styled.div<{ isVisible: boolean; isMounted: boolean }>`
   border: 1px solid black;
   background-color: ${({ isMounted }) => (isMounted ? "red" : "pink")};
   display: inline-block;
-  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
+  opacity: ${({ isVisible, isMounted }) => (isVisible || isMounted ? 1 : 0)};
   transition: opacity 0.2s linear;
 `;
 

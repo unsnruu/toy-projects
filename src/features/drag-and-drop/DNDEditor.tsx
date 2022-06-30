@@ -1,4 +1,5 @@
 import styled from "@emotion/styled/";
+import React from "react";
 
 const Rect = styled.div`
   width: 20px;
@@ -12,21 +13,21 @@ const EditorWrapper = styled.div`
   border: 1px solid black;
   padding: 1rem;
 `;
+interface EditorProps {
+  handleDragEnd: (e: React.DragEvent<HTMLDivElement>) => void;
+  handleDragStart: (e: React.DragEvent<HTMLDivElement>) => void;
+}
 
-function Editor() {
+function DndEditor({ handleDragStart, handleDragEnd }: EditorProps) {
   return (
     <EditorWrapper>
       <Rect
         draggable={true}
-        onDragStart={(e) => {
-          console.log("drag start");
-        }}
-        onDragEnd={() => {
-          console.log("drag end");
-        }}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
       />
     </EditorWrapper>
   );
 }
 
-export default Editor;
+export default DndEditor;
