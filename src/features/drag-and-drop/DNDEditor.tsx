@@ -1,5 +1,5 @@
-import styled from "@emotion/styled/";
 import React from "react";
+import styled from "@emotion/styled/";
 
 import { EditorSelection, Shape } from "./DnDContainer";
 
@@ -13,55 +13,66 @@ const EditorWrapper = styled.div`
     margin-right: 1rem;
   }
 `;
-
-const Rect = styled.div`
+const Rect = styled.div<{ color: string }>`
   width: 20px;
   height: 20px;
-  background-color: black;
+  background-color: ${(props) => props.color};
 `;
-const Tri = styled.div`
+const Tri = styled.div<{ color: string }>`
   width: 0px;
   height: 0px;
-  /* background-color: black; */
-  border-bottom: calc(10px * 1.732) solid black;
+  border-bottom: calc(10px * 1.732) solid ${(props) => props.color};
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
 `;
-const Circle = styled.div`
+const Circle = styled.div<{ color: string }>`
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background-color: black;
+  background-color: ${(props) => props.color};
 `;
 
 interface EditorProps {
   editorSelection: EditorSelection;
-  handleDragStart: (shape: Shape) => () => void;
+  handleDragStart: (shape: Shape, color: string) => () => void;
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>) => void;
+  changeEditorColor: (color: string) => void;
 }
 
 function DnDEditor({
   editorSelection,
   handleDragStart,
   handleDragEnd,
+  changeEditorColor,
 }: EditorProps) {
   return (
     <EditorWrapper>
       <Rect
         draggable={true}
-        onDragStart={handleDragStart("rectangle")}
+        onDragStart={handleDragStart("rectangle", editorSelection.color)}
         onDragEnd={handleDragEnd}
+        color={editorSelection.color}
       />
       <Tri
         draggable={true}
-        onDragStart={handleDragStart("triangle")}
+        onDragStart={handleDragStart("triangle", editorSelection.color)}
         onDragEnd={handleDragEnd}
+        color={editorSelection.color}
       />
       <Circle
         draggable={true}
-        onDragStart={handleDragStart("circle")}
+        onDragStart={handleDragStart("circle", editorSelection.color)}
         onDragEnd={handleDragEnd}
+        color={editorSelection.color}
       />
+      <div>
+        <input
+          type="color"
+          onChange={({ target }) => {
+            changeEditorColor(target.value);
+          }}
+        />
+      </div>
     </EditorWrapper>
   );
 }

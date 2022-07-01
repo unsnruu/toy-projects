@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import styled from "@emotion/styled";
 
 import { Element } from "./DnDContainer";
@@ -12,31 +13,44 @@ const CanvasWrapper = styled.div`
     flex: 1 1;
   }
 `;
+
 interface DnDCanvasProps {
   elements: Element[];
-  handleDragEnter: (id: Number) => (e: React.DragEvent<HTMLDivElement>) => void;
-  handleDragLeave: (id: Number) => (e: React.DragEvent<HTMLDivElement>) => void;
+  handleDragEnter: (id: number) => (e: React.DragEvent<HTMLDivElement>) => void;
+  handleDragLeave: (id: number) => (e: React.DragEvent<HTMLDivElement>) => void;
   handleDragLeaveOuter: (e: React.DragEvent<HTMLDivElement>) => void;
 }
+interface CanvasRow {}
 function DnDCanvas({
   elements,
   handleDragEnter,
   handleDragLeave,
   handleDragLeaveOuter,
 }: DnDCanvasProps) {
+  const [canvasRows, setCanvasRows] = useState<CanvasRow[]>([{}]);
+
   return (
     <CanvasWrapper onDragLeave={handleDragLeaveOuter}>
-      {elements.map(({ id, shape, color, isMounted, isVisible }) => (
-        <CanvasElement
-          id={id}
-          key={id}
-          shape={shape}
-          color={color}
-          isMounted={isMounted}
-          isVisible={isVisible}
-          handleDragEnter={handleDragEnter(id)}
-          handleDragLeave={handleDragLeave(id)}
-        />
+      {canvasRows.map((row) => (
+        <div style={{ display: "flex" }}>
+          <div
+            style={{ width: "100px", height: "100px", backgroundColor: "blue" }}
+          />
+        </div>
+      ))}
+      {elements.map(({ id, shape, color, isMounted, isHovering }) => (
+        <div>
+          <CanvasElement
+            id={id}
+            key={id}
+            shape={shape}
+            color={color}
+            isMounted={isMounted}
+            isHovering={isHovering}
+            handleDragEnter={handleDragEnter(id)}
+            handleDragLeave={handleDragLeave(id)}
+          />
+        </div>
       ))}
     </CanvasWrapper>
   );
@@ -46,25 +60,26 @@ export default DnDCanvas;
 
 interface ShpaeProps {
   color: string;
-  isVisible: boolean;
+  isHovering: boolean;
   isMounted: boolean;
 }
 const Rectangle = styled.div<ShpaeProps>`
   width: 100px;
   height: 100px;
-  border: 1px solid black;
-  background-color: ${({ isMounted, color }) => (isMounted ? color : "pink")};
+  background-color: ${({ isMounted, isHovering, color }) =>
+    isMounted ? color : isHovering ? "gray" : "white"};
   display: inline-block;
-  opacity: ${({ isVisible, isMounted }) => (isVisible || isMounted ? 1 : 0)};
+  opacity: 1;
   transition: opacity 0.2s linear;
 `;
 const Triangle = styled.div<ShpaeProps>`
   border-left: 50px solid transparent;
   border-right: 50px solid transparent;
   border-bottom: calc(50px * 1.732) solid
-    ${({ isMounted, color }) => (isMounted ? color : "gray")};
+    ${({ isHovering, isMounted, color }) =>
+      isMounted ? color : isHovering ? "gray" : "white"};
   display: inline-block;
-  opacity: ${({ isVisible, isMounted }) => (isVisible || isMounted ? 1 : 0)};
+  opacity: ${({ isHovering, isMounted }) => (isHovering || isMounted ? 1 : 0)};
   transition: opacity 0.2s linear;
 `;
 const Circle = styled.div<ShpaeProps>`
@@ -72,8 +87,9 @@ const Circle = styled.div<ShpaeProps>`
   height: 100px;
   border-radius: 50%;
   display: inline-block;
-  background-color: ${({ isMounted, color }) => (isMounted ? color : "gray")};
-  opacity: ${({ isVisible, isMounted }) => (isVisible || isMounted ? 1 : 0)};
+  background-color: ${({ isMounted, isHovering, color }) =>
+    isMounted ? color : isHovering ? "gray" : "white"};
+  opacity: ${({ isHovering, isMounted }) => (isHovering || isMounted ? 1 : 0)};
   transition: opacity 0.2s linear;
 `;
 
@@ -85,7 +101,7 @@ function CanvasElement({
   shape,
   color,
   isMounted,
-  isVisible,
+  isHovering,
   handleDragEnter,
   handleDragLeave,
 }: CanvasElementProps) {
@@ -94,7 +110,7 @@ function CanvasElement({
       return (
         <Circle
           color={color}
-          isVisible={isVisible}
+          isHovering={isHovering}
           isMounted={isMounted}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
@@ -104,7 +120,7 @@ function CanvasElement({
       return (
         <Rectangle
           color={color}
-          isVisible={isVisible}
+          isHovering={isHovering}
           isMounted={isMounted}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
@@ -114,7 +130,7 @@ function CanvasElement({
       return (
         <Triangle
           color={color}
-          isVisible={isVisible}
+          isHovering={isHovering}
           isMounted={isMounted}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
