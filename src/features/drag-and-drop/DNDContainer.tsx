@@ -1,32 +1,36 @@
 import { useState, useEffect } from "react";
 
 import DnDEditor from "./DnDEditor";
-import DNDGraph from "./DnDGraph";
+import DNDGraph from "./DnDCanvas";
 
+export type Shape = "rectangle" | "triangle" | "circle";
+export type Color = "black" | "red" | "green" | "blue";
+export interface EditorSelection {
+  shape: Shape;
+  color: Color;
+}
 export interface Element {
   id: number;
   isVisible: boolean;
   isMounted: boolean;
+  shape: Shape;
 }
-const initElements: Element[] = Array.from({ length: 9 }, (v, idx) => ({
+const initElements: Element[] = Array.from({ length: 9 }, (_, idx) => ({
   id: idx,
   isMounted: false,
   isVisible: false,
+  shape: "rectangle",
 }));
-initElements[0].isMounted = true;
-initElements[0].isVisible = true;
 
-interface EditorData {
-  shape: string;
-  color: string;
-}
-function DNDContainer() {
-  const [editor, setEditor] = useState({});
+function DnDContainer() {
+  const [editorSelection, setEditorSelection] = useState<EditorSelection>({
+    shape: "rectangle",
+    color: "black",
+  });
+
   const [elements, setElements] = useState<Element[]>(initElements);
-
   const [isDragging, setIsDragging] = useState(false);
   const [selected, setSelected] = useState<null | Number>(null);
-  console.log(selected);
 
   useEffect(() => {
     if (Number.isNaN(selected) || isDragging) return;
@@ -54,6 +58,7 @@ function DNDContainer() {
       const newElements = elements.map((elem) => {
         if (elem.id === id && !elem.isMounted) {
           elem.isVisible = true;
+          elem.shape = editorSelection.shape;
         }
         return elem;
       });
@@ -81,9 +86,11 @@ function DNDContainer() {
       );
     };
 
-  const handleDragStart = () => {
+  const handleDragStart = (shape: Shape) => () => {
     console.log("drag start");
+
     setIsDragging(true);
+    setEditorSelection((prev) => ({ ...prev, shape }));
   };
   const handleDragEnd = (event: React.DragEvent<HTMLDivElement>) => {
     console.log("drag end");
@@ -94,6 +101,7 @@ function DNDContainer() {
   return (
     <div>
       <DnDEditor
+        editorSelection={editorSelection}
         handleDragStart={handleDragStart}
         handleDragEnd={handleDragEnd}
       />
@@ -107,4 +115,4 @@ function DNDContainer() {
   );
 }
 
-export default DNDContainer;
+export default DnDContainer;
