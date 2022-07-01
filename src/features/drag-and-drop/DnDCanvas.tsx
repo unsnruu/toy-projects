@@ -20,37 +20,42 @@ interface DnDCanvasProps {
   handleDragLeave: (id: number) => (e: React.DragEvent<HTMLDivElement>) => void;
   handleDragLeaveOuter: (e: React.DragEvent<HTMLDivElement>) => void;
 }
-interface CanvasRow {}
+
+// interface CanvasRow {}
 function DnDCanvas({
   elements,
   handleDragEnter,
   handleDragLeave,
   handleDragLeaveOuter,
 }: DnDCanvasProps) {
-  const [canvasRows, setCanvasRows] = useState<CanvasRow[]>([{}]);
-
+  // const [canvasRows, setCanvasRows] = useState([]);
+  const itemStyle: React.CSSProperties = {
+    height: "1rem",
+    backgroundColor: "skyblue",
+    marginBottom: "1rem",
+  };
+  const [items, setItems] = useState<Element[]>([
+    {
+      color: "black",
+      id: 0,
+      isHovering: false,
+      isMounted: false,
+      shape: "rectangle",
+    },
+  ]);
   return (
-    <CanvasWrapper onDragLeave={handleDragLeaveOuter}>
-      {canvasRows.map((row) => (
-        <div style={{ display: "flex" }}>
-          <div
-            style={{ width: "100px", height: "100px", backgroundColor: "blue" }}
-          />
-        </div>
-      ))}
+    <CanvasWrapper>
       {elements.map(({ id, shape, color, isMounted, isHovering }) => (
-        <div>
-          <CanvasElement
-            id={id}
-            key={id}
-            shape={shape}
-            color={color}
-            isMounted={isMounted}
-            isHovering={isHovering}
-            handleDragEnter={handleDragEnter(id)}
-            handleDragLeave={handleDragLeave(id)}
-          />
-        </div>
+        <CanvasElement
+          id={id}
+          key={id}
+          shape={shape}
+          color={color}
+          isMounted={isMounted}
+          isHovering={isHovering}
+          handleDragEnter={handleDragEnter(id)}
+          handleDragLeave={handleDragLeave(id)}
+        />
       ))}
     </CanvasWrapper>
   );
@@ -138,3 +143,17 @@ function CanvasElement({
       );
   }
 }
+// {
+//   elements.map(({ id, shape, color, isMounted, isHovering }) => (
+//     <CanvasElement
+//       id={id}
+//       key={id}
+//       shape={shape}
+//       color={color}
+//       isMounted={isMounted}
+//       isHovering={isHovering}
+//       handleDragEnter={handleDragEnter(id)}
+//       handleDragLeave={handleDragLeave(id)}
+//     />
+//   ));
+// }
