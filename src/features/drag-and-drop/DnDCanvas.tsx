@@ -1,87 +1,99 @@
 import styled from "@emotion/styled";
 
-import { Element, Shape } from "./DnDContainer";
+import { Element } from "./DnDContainer";
 
-const GraphWrapper = styled.div`
-  width: 310px;
-  height: 310px;
+const CanvasWrapper = styled.div`
+  width: 400px;
+  height: 400px;
   padding: 2rem;
   border: 1px solid black;
+  & div {
+    margin: 0.5rem;
+    flex: 1 1;
+  }
 `;
-interface DnDGraphProps {
+interface DnDCanvasProps {
   elements: Element[];
   handleDragEnter: (id: Number) => (e: React.DragEvent<HTMLDivElement>) => void;
   handleDragLeave: (id: Number) => (e: React.DragEvent<HTMLDivElement>) => void;
   handleDragLeaveOuter: (e: React.DragEvent<HTMLDivElement>) => void;
 }
-function DnDGraph({
+function DnDCanvas({
   elements,
   handleDragEnter,
   handleDragLeave,
   handleDragLeaveOuter,
-}: DnDGraphProps) {
+}: DnDCanvasProps) {
   return (
-    <GraphWrapper onDragLeave={handleDragLeaveOuter}>
-      {elements.map(({ id, shape, isMounted, isVisible }) => (
-        <GraphElement
+    <CanvasWrapper onDragLeave={handleDragLeaveOuter}>
+      {elements.map(({ id, shape, color, isMounted, isVisible }) => (
+        <CanvasElement
           id={id}
           key={id}
           shape={shape}
+          color={color}
           isMounted={isMounted}
           isVisible={isVisible}
           handleDragEnter={handleDragEnter(id)}
           handleDragLeave={handleDragLeave(id)}
         />
       ))}
-    </GraphWrapper>
+    </CanvasWrapper>
   );
 }
 
-export default DnDGraph;
+export default DnDCanvas;
 
-const Rectangle = styled.div<{ isVisible: boolean; isMounted: boolean }>`
+interface ShpaeProps {
+  color: string;
+  isVisible: boolean;
+  isMounted: boolean;
+}
+const Rectangle = styled.div<ShpaeProps>`
   width: 100px;
   height: 100px;
   border: 1px solid black;
-  background-color: ${({ isMounted }) => (isMounted ? "red" : "pink")};
+  background-color: ${({ isMounted, color }) => (isMounted ? color : "pink")};
   display: inline-block;
   opacity: ${({ isVisible, isMounted }) => (isVisible || isMounted ? 1 : 0)};
   transition: opacity 0.2s linear;
 `;
-const Triangle = styled.div<{ isVisible: boolean; isMounted: boolean }>`
+const Triangle = styled.div<ShpaeProps>`
   border-left: 50px solid transparent;
   border-right: 50px solid transparent;
   border-bottom: calc(50px * 1.732) solid
-    ${(props) => (props.isMounted ? "black" : "gray")};
+    ${({ isMounted, color }) => (isMounted ? color : "gray")};
   display: inline-block;
   opacity: ${({ isVisible, isMounted }) => (isVisible || isMounted ? 1 : 0)};
   transition: opacity 0.2s linear;
 `;
-const Circle = styled.div<{ isVisible: boolean; isMounted: boolean }>`
+const Circle = styled.div<ShpaeProps>`
   width: 100px;
   height: 100px;
   border-radius: 50%;
   display: inline-block;
-  background-color: ${({ isMounted }) => (isMounted ? "black" : "gray")};
+  background-color: ${({ isMounted, color }) => (isMounted ? color : "gray")};
   opacity: ${({ isVisible, isMounted }) => (isVisible || isMounted ? 1 : 0)};
   transition: opacity 0.2s linear;
 `;
 
-interface GraphElementProps extends Element {
+interface CanvasElementProps extends Element {
   handleDragEnter: (e: React.DragEvent<HTMLDivElement>) => void;
   handleDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
 }
-function GraphElement({
+function CanvasElement({
   shape,
+  color,
   isMounted,
   isVisible,
   handleDragEnter,
   handleDragLeave,
-}: GraphElementProps) {
+}: CanvasElementProps) {
   switch (shape) {
     case "circle":
       return (
         <Circle
+          color={color}
           isVisible={isVisible}
           isMounted={isMounted}
           onDragEnter={handleDragEnter}
@@ -91,6 +103,7 @@ function GraphElement({
     case "rectangle":
       return (
         <Rectangle
+          color={color}
           isVisible={isVisible}
           isMounted={isMounted}
           onDragEnter={handleDragEnter}
@@ -100,6 +113,7 @@ function GraphElement({
     case "triangle":
       return (
         <Triangle
+          color={color}
           isVisible={isVisible}
           isMounted={isMounted}
           onDragEnter={handleDragEnter}
