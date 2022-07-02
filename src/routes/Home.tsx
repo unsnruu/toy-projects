@@ -11,7 +11,7 @@ function Home() {
     <HomeWrapper>
       <Link to="/counter">Counter</Link>
       <Link to="/dragndrop">drag and drop</Link>
-      <Link to="/canvas">canvas</Link>
+      <Link to="/templatemaker">template maker</Link>
     </HomeWrapper>
   );
 }
