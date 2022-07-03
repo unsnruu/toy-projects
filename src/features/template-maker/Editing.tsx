@@ -1,8 +1,7 @@
 import styled from "@emotion/styled";
 import React from "react";
 
-import { EditingItemType } from "./Container";
-
+import { EditingItemType } from "./types";
 const Wrapper = styled.div`
   width: 70%;
   border: 1px solid black;
@@ -27,12 +26,12 @@ function Editing({
 }: EditingProps) {
   return (
     <Wrapper onDragEnter={handlerDragEnterOuterspace}>
-      {editingItems.map(({ id, option }) => (
+      {editingItems.map(({ id, renderTo }) => (
         <EditingItem
           key={id}
           handleDragEnter={createHandleDragEnterById(id)}
           handleDragLeave={createHandleDragLeaveById(id)}
-          option={option}
+          renderTo={renderTo}
         />
       ))}
     </Wrapper>
@@ -69,11 +68,11 @@ interface EditingItemProps extends Omit<EditingItemType, "id"> {
   handleDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
 }
 function EditingItem({
-  option,
+  renderTo,
   handleDragEnter,
   handleDragLeave,
 }: EditingItemProps) {
-  switch (option) {
+  switch (renderTo) {
     case "circle":
       return <CircleItem />;
     case "rectangle":

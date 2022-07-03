@@ -2,37 +2,28 @@ import styled from "@emotion/styled";
 import React, { createContext, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { MakerSelection, EditableOption, EditingItemType } from "./types";
 import Editor from "./Editor";
 import Editing from "./Editing";
-
-export type EditableOption = "rectangle" | "triangle" | "circle";
-interface GlobalSelection {
-  selectedIcon: EditableOption;
-  selectedItem: string | null;
-}
 
 const Wrapper = styled.div`
   display: flex;
 `;
-const initGlobalSelection: GlobalSelection = {
+const initGlobalSelection: MakerSelection = {
   selectedIcon: "rectangle",
   selectedItem: null,
 };
 const TeamplateMakerContext =
-  createContext<GlobalSelection>(initGlobalSelection);
+  createContext<MakerSelection>(initGlobalSelection);
 
-export interface EditingItemType {
-  id: string;
-  option: EditableOption | null;
-}
 const initEditingItems: EditingItemType[] = [
-  { id: uuidv4(), option: null },
-  { id: uuidv4(), option: null },
-  { id: uuidv4(), option: null },
+  { id: uuidv4(), renderTo: "empty" },
+  { id: uuidv4(), renderTo: "empty" },
+  { id: uuidv4(), renderTo: "empty" },
 ];
 function Container() {
   const [globalSelection, setGlobalSelection] =
-    useState<GlobalSelection>(initGlobalSelection);
+    useState<MakerSelection>(initGlobalSelection);
   const [editingItems, setEditingItems] =
     useState<EditingItemType[]>(initEditingItems);
   //Event Handlers
@@ -47,7 +38,7 @@ function Container() {
     setEditingItems((items) =>
       items.map((item) => {
         if (item.id === globalSelection.selectedItem) {
-          item.option = globalSelection.selectedIcon;
+          item.renderTo = globalSelection.selectedIcon;
         }
         return item;
       })
@@ -58,7 +49,10 @@ function Container() {
     if (idx === -1) throw new Error("id에 해당하는 아이템이 없습니다.");
 
     const front = editingItems.slice(0, idx + 1);
-    const newItem: EditingItemType = { id: uuidv4(), option: null };
+    const newItem: EditingItemType = {
+      id: uuidv4(),
+      renderTo: "empty",
+    };
     const back = editingItems.slice(idx + 1);
     const newEditingItems = front.concat(newItem).concat(back);
 
@@ -80,7 +74,7 @@ function Container() {
   };
   const createDragEnterItem =
     (id: string) => (e: React.DragEvent<HTMLDivElement>) => {
-      console.log("Icon has entered in item");
+      console.log(`Icon has entered in item ${id}`);
       e.stopPropagation();
       addNextItemsById(id);
       setGlobalSelection((selection) => ({ ...selection, selectedItem: id }));

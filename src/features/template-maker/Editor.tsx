@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import React from "react";
 
-import { EditableOption } from "./Container";
+import { EditableOption } from "./types";
 import EditorIcons from "./EditorIcons";
 
 const Wrapper = styled.div`
