@@ -1,42 +1,56 @@
 import styled from "@emotion/styled";
-import React from "react";
+import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import { EditingItemType } from "./types";
-import EditingItemWrapper from "./EditingItem";
+import EditingOuterElement from "./EditingOuterElement";
 
-const Wrapper = styled.div`
+const EditingWrapper = styled.div`
   width: 70%;
   border: 1px solid black;
   padding: 1rem;
 `;
 
-interface EditingProps {
-  editingItems: EditingItemType[];
-  handlerDragEnterOuterspace: (e: React.DragEvent<HTMLDivElement>) => void;
-  createHandleDragEnterById: (
-    id: string
-  ) => (e: React.DragEvent<HTMLDivElement>) => void;
-  createHandleDragLeaveById: (
-    id: string
-  ) => (e: React.DragEvent<HTMLDivElement>) => void;
+interface EditingElement {
+  id: string;
+  isExpanded: boolean;
 }
-function Editing({
-  editingItems,
-  handlerDragEnterOuterspace,
-  createHandleDragEnterById,
-  createHandleDragLeaveById,
-}: EditingProps) {
+interface EditingProps {}
+
+function Editing({}: EditingProps) {
+  const [editingElements, setEditingElements] = useState<EditingElement[]>();
+
+  const [isDraggedIn, setIsDraggedIn] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleDragEnterEditing = () => {
+    console.log(`Drag entered in Editing`);
+    setIsDraggedIn(false);
+    setIsExpanded(false);
+  };
+  const handleDragEnterElement = (e: React.DragEvent<HTMLDivElement>) => {
+    console.log(`Drag entered in element`);
+    e.stopPropagation();
+
+    setIsDraggedIn(true);
+    setIsExpanded(true);
+  };
+
   return (
-    <Wrapper onDragEnter={handlerDragEnterOuterspace}>
-      {editingItems.map(({ id, renderTo }) => (
-        <EditingItemWrapper
-          key={id}
-          handleDragEnter={createHandleDragEnterById(id)}
-          handleDragLeave={createHandleDragLeaveById(id)}
-          renderTo={renderTo}
-        />
-      ))}
-    </Wrapper>
+    <EditingWrapper onDragEnter={handleDragEnterEditing}>
+      <EditingOuterElement
+        isExpanded={isExpanded}
+        handleDragEnterElement={handleDragEnterElement}
+      />
+      <EditingOuterElement
+        isExpanded={isExpanded}
+        handleDragEnterElement={handleDragEnterElement}
+      />
+      <EditingOuterElement
+        isExpanded={isExpanded}
+        handleDragEnterElement={handleDragEnterElement}
+      />
+    </EditingWrapper>
   );
 }
 
