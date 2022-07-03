@@ -1,7 +1,7 @@
 export type EditableOption = "rectangle" | "triangle" | "circle" | "empty";
 
 export interface MakerSelection {
-  selectedIcon: EditableOption;
+  selectedOption: EditableOption;
   selectedItem: string | null;
 }
 
