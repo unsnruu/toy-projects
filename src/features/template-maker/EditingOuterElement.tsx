@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "@emotion/styled";
 
 import EditingInnerElement from "./EditingInnterElement";
 
 const Wrapper = styled.div`
   border: 1px solid black;
-  height: 10rem;
 `;
 //유저가 들어왔음을 어떻게 알 수 있는가?
 interface EditingOuterElementProps {

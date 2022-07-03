@@ -1,82 +1,80 @@
 import styled from "@emotion/styled";
-import React, { createContext, useState } from "react";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import { MakerSelection, EditableOption, EditingItemType } from "./types";
+import { EditableOption } from "./types";
 import Editor from "./Editor";
 import Editing from "./Editing";
 
 const Wrapper = styled.div`
   display: flex;
 `;
-const initGlobalSelection: MakerSelection = {
-  selectedOption: "rectangle",
-  selectedItem: null,
-};
-const TeamplateMakerContext =
-  createContext<MakerSelection>(initGlobalSelection);
 
-const initEditingItems: EditingItemType[] = [
-  { id: uuidv4(), renderTo: "empty" },
-  { id: uuidv4(), renderTo: "empty" },
-  { id: uuidv4(), renderTo: "empty" },
+export interface EditingElement {
+  id: string;
+  isExpanded: boolean;
+}
+const initEditingElements: EditingElement[] = [
+  { id: uuidv4(), isExpanded: false },
+  { id: uuidv4(), isExpanded: false },
+  { id: uuidv4(), isExpanded: false },
 ];
+
 function Container() {
-  const [globalSelection, setGlobalSelection] =
-    useState<MakerSelection>(initGlobalSelection);
-  const [editingItems, setEditingItems] =
-    useState<EditingItemType[]>(initEditingItems);
+  const [editingElements, setEditingElements] =
+    useState<EditingElement[]>(initEditingElements);
+
+  const setOnlyIsExpandedTrue = (id: string) => (value: boolean) => {
+    const newEditingElements = editingElements.map((elem) => {
+      if (elem.id === id) elem.isExpanded = value;
+      else elem.isExpanded = !value;
+      return elem;
+    });
+    setEditingElements(newEditingElements);
+  };
+  const setAllIsExpandedFalse = () => {
+    const newEditingElements = editingElements.map((elem) => {
+      elem.isExpanded = false;
+      return elem;
+    });
+    setEditingElements(newEditingElements);
+  };
   //Event Handlers
   const createDragStartHandler =
     (selectedOption: EditableOption) =>
     (e: React.DragEvent<HTMLDivElement>) => {
       console.log(`globally selected ${selectedOption}`);
-      setGlobalSelection((prev) => ({ ...prev, selectedOption }));
     };
+
   const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
     console.log("drag end");
-    //선택되어있던 엘리먼트를 선택된 컴포넌트로 교체하기
-    setEditingItems((items) =>
-      items.map((item) => {
-        if (item.id === globalSelection.selectedItem) {
-          item.renderTo = globalSelection.selectedOption;
-        }
-        return item;
-      })
-    );
+    setAllIsExpandedFalse();
   };
 
-  const handleDragEnterOuter = (e: React.DragEvent<HTMLDivElement>) => {
-    console.log(`Icon entered in outer space`);
-    setGlobalSelection((selection) => ({ ...selection, selectedItem: null }));
+  const handleDragEnterEditing = () => {
+    console.log(`Drag entered in Editing`);
+    setAllIsExpandedFalse();
   };
-  const createDragEnterItem =
+  const createDragEnterElementHandler =
     (id: string) => (e: React.DragEvent<HTMLDivElement>) => {
-      console.log(`Icon has entered in item ${id}`);
+      console.log(`Drag entered in element ${id}`);
       e.stopPropagation();
-      // addNextItemsById(id);
-      setGlobalSelection((selection) => ({ ...selection, selectedItem: id }));
+
+      setOnlyIsExpandedTrue(id)(true);
     };
-  const createHandleDragLeaveById =
-    (id: string) => (e: React.DragEvent<HTMLDivElement>) => {
-      //id에 해당되는 item을 globalSelection에 해당되는 값으로 치환하가.
-      // deleteNextItemById(id);
-    };
+
   return (
-    <TeamplateMakerContext.Provider value={globalSelection}>
-      <Wrapper>
-        <Editing
-          editingItems={editingItems}
-          handlerDragEnterOuterspace={handleDragEnterOuter}
-          createHandleDragEnterById={createDragEnterItem}
-          createHandleDragLeaveById={createHandleDragLeaveById}
-        />
-        <Editor
-          createDragStartHandler={createDragStartHandler}
-          handleDragEnd={handleDragEnd}
-        />
-      </Wrapper>
-    </TeamplateMakerContext.Provider>
+    <Wrapper>
+      <Editing
+        editingElements={editingElements}
+        handleDragEnterEditing={handleDragEnterEditing}
+        createDragEnterElementHandler={createDragEnterElementHandler}
+      />
+      <Editor
+        createDragStartHandler={createDragStartHandler}
+        handleDragEnd={handleDragEnd}
+      />
+    </Wrapper>
   );
 }
 
