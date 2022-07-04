@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
-import React, { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import React from "react";
 
 import { EditingElement } from "./Container";
 import EditingOuterElement from "./EditingOuterElement";
@@ -12,7 +11,7 @@ const EditingWrapper = styled.div`
 `;
 
 interface EditingProps {
-  editingElements: EditingElement[];
+  elements: EditingElement[];
   handleDragEnterEditing: () => void;
   createDragEnterElementHandler: (
     id: string
@@ -20,15 +19,16 @@ interface EditingProps {
 }
 
 function Editing({
-  editingElements,
+  elements,
   handleDragEnterEditing,
   createDragEnterElementHandler,
 }: EditingProps) {
   return (
     <EditingWrapper onDragEnter={handleDragEnterEditing}>
-      {editingElements.map(({ id, isExpanded }) => (
+      {elements.map(({ id, content, isExpanded }) => (
         <EditingOuterElement
           key={id}
+          content={content}
           isExpanded={isExpanded}
           handleDragEnterElement={createDragEnterElementHandler(id)}
         />

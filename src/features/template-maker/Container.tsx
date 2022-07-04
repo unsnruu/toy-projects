@@ -1,8 +1,7 @@
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
-import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import { EditableOption } from "./types";
 import Editor from "./Editor";
 import Editing from "./Editing";
 
@@ -13,18 +12,36 @@ const Wrapper = styled.div`
 export interface EditingElement {
   id: string;
   isExpanded: boolean;
+  content: string;
 }
 const initEditingElements: EditingElement[] = [
-  { id: uuidv4(), isExpanded: false },
-  { id: uuidv4(), isExpanded: false },
-  { id: uuidv4(), isExpanded: false },
+  { id: uuidv4(), isExpanded: false, content: "1" },
+  { id: uuidv4(), isExpanded: false, content: "2" },
+  { id: uuidv4(), isExpanded: false, content: "3" },
+];
+
+export interface EditorElement {
+  option: string;
+}
+const initEditorElements: EditorElement[] = [
+  { option: "A" },
+  { option: "B" },
+  { option: "C" },
 ];
 
 function Container() {
-  const [editingElements, setEditingElements] =
-    useState<EditingElement[]>(initEditingElements);
+  const [editingElements, setEditingElements] = useState(initEditingElements);
+  const [editorElements, setEditorElements] = useState(initEditorElements);
 
-  const setOnlyIsExpandedTrue = (id: string) => (value: boolean) => {
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedElement, setselectedElement] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log(selectedOption);
+    console.log(selectedElement);
+  }, [selectedElement, selectedOption]);
+
+  const setOnlyElement = (id: string) => (value: boolean) => {
     const newEditingElements = editingElements.map((elem) => {
       if (elem.id === id) elem.isExpanded = value;
       else elem.isExpanded = !value;
@@ -39,68 +56,68 @@ function Container() {
     });
     setEditingElements(newEditingElements);
   };
+  const addEditingItemNextTo = (id: string) => {
+    const newEditingElements = [...editingElements];
+    const idx = newEditingElements.findIndex((elem) => elem.id === id);
+
+    if (idx < 0) return;
+    const newElement: EditingElement = {
+      id: uuidv4(),
+      isExpanded: false,
+      content: selectedOption ? selectedOption : "temp",
+    };
+    newEditingElements.splice(idx + 1, 0, newElement);
+
+    setEditingElements(newEditingElements);
+  };
   //Event Handlers
-  const createDragStartHandler =
-    (selectedOption: EditableOption) =>
-    (e: React.DragEvent<HTMLDivElement>) => {
-      console.log(`globally selected ${selectedOption}`);
-    };
+  const eventHandlersOnEditor = {
+    createDragStartHandler: (option: string) => () => {
+      console.log(`drag start`);
+      setSelectedOption(option);
+    },
+    handleDragEnd: () => {
+      console.log("drag end");
+      setAllIsExpandedFalse();
 
-  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-    console.log("drag end");
-    setAllIsExpandedFalse();
+      if (selectedElement && selectedOption) {
+        addEditingItemNextTo(selectedElement);
+      }
+
+      setSelectedOption(null);
+    },
   };
-
-  const handleDragEnterEditing = () => {
-    console.log(`Drag entered in Editing`);
-    setAllIsExpandedFalse();
+  const eventHandlersOnEditing = {
+    handleDragEnterEditing: () => {
+      console.log(`Drag entered in Editing`);
+      setAllIsExpandedFalse();
+      setselectedElement(null);
+    },
+    createDragEnterElementHandler:
+      (id: string) => (e: React.DragEvent<HTMLDivElement>) => {
+        console.log(`Drag entered in element ${id}`);
+        e.stopPropagation();
+        setOnlyElement(id)(true);
+        setselectedElement(id);
+      },
   };
-  const createDragEnterElementHandler =
-    (id: string) => (e: React.DragEvent<HTMLDivElement>) => {
-      console.log(`Drag entered in element ${id}`);
-      e.stopPropagation();
-
-      setOnlyIsExpandedTrue(id)(true);
-    };
 
   return (
     <Wrapper>
       <Editing
-        editingElements={editingElements}
-        handleDragEnterEditing={handleDragEnterEditing}
-        createDragEnterElementHandler={createDragEnterElementHandler}
+        elements={editingElements}
+        handleDragEnterEditing={eventHandlersOnEditing.handleDragEnterEditing}
+        createDragEnterElementHandler={
+          eventHandlersOnEditing.createDragEnterElementHandler
+        }
       />
       <Editor
-        createDragStartHandler={createDragStartHandler}
-        handleDragEnd={handleDragEnd}
+        elements={editorElements}
+        createDragStartHandler={eventHandlersOnEditor.createDragStartHandler}
+        handleDragEnd={eventHandlersOnEditor.handleDragEnd}
       />
     </Wrapper>
   );
 }
 
 export default Container;
-
-// const addNextItemsById = (id: string) => {
-//   const idx = editingItems.findIndex((item) => item.id === id);
-//   if (idx === -1) throw new Error("id에 해당하는 아이템이 없습니다.");
-
-//   const front = editingItems.slice(0, idx + 1);
-//   const newItem: EditingItemType = {
-//     id: uuidv4(),
-//     renderTo: "empty",
-//   };
-//   const back = editingItems.slice(idx + 1);
-//   const newEditingItems = front.concat(newItem).concat(back);
-
-//   setEditingItems(newEditingItems);
-// };
-// const deleteNextItemById = (id: string) => {
-//   const idx = editingItems.findIndex((item) => item.id === id);
-//   if (idx === -1) throw new Error("id에 해당하는 아이템이 없습니다.");
-
-//   const front = editingItems.slice(0, idx + 1);
-//   const back = editingItems.slice(idx + 2);
-//   const newEditingItems = front.concat(back);
-
-//   setEditingItems(newEditingItems);
-// };

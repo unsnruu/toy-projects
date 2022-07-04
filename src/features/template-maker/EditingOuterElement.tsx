@@ -8,16 +8,18 @@ const Wrapper = styled.div`
 `;
 //유저가 들어왔음을 어떻게 알 수 있는가?
 interface EditingOuterElementProps {
+  content: string;
   isExpanded: boolean;
   handleDragEnterElement: (e: React.DragEvent<HTMLDivElement>) => void;
 }
 function EditingOuterElement({
   isExpanded,
+  content,
   handleDragEnterElement,
 }: EditingOuterElementProps) {
   return (
     <Wrapper onDragEnter={handleDragEnterElement}>
-      <EditingInnerElement isExpanded={isExpanded} />
+      <EditingInnerElement content={content} isExpanded={isExpanded} />
     </Wrapper>
   );
 }

@@ -1,11 +1,15 @@
 interface EditingInnerElementProps {
   isExpanded: boolean;
+  content: string;
 }
 
-function EditingInnerElement({ isExpanded }: EditingInnerElementProps) {
+function EditingInnerElement({
+  isExpanded,
+  content,
+}: EditingInnerElementProps) {
   return (
     <div>
-      <div>Fixed</div>
+      <div>{content}</div>
       {isExpanded ? <div>Expanded</div> : null}
     </div>
   );

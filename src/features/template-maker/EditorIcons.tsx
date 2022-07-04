@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 
-import { EditableOption } from "./Container";
+import { EditableOption } from "./types";
 
 const Icons = styled.div`
   margin: 1rem;
