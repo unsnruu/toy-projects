@@ -9,7 +9,7 @@ import {
 import EditingOuterElement from "./EditingOuterElement";
 import ElementController from "./ElementController";
 
-const EditingWrapper = styled.div`
+const EditingPaper = styled.div`
   width: 70%;
   height: 100vh;
   overflow: scroll;
@@ -28,7 +28,7 @@ function Editing({
   contorllerEventHandlers,
 }: EditingProps) {
   return (
-    <EditingWrapper onDragEnter={editingEventHandlers.handleDragEnterEditing}>
+    <EditingPaper onDragEnter={editingEventHandlers.handleDragEnterEditing}>
       {elements.map(({ id, content, isExpanded, isDraggable }) => (
         <ElementController
           key={id}
@@ -45,7 +45,7 @@ function Editing({
           />
         </ElementController>
       ))}
-    </EditingWrapper>
+    </EditingPaper>
   );
 }
 

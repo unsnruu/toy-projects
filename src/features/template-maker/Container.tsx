@@ -41,7 +41,6 @@ export interface EditingEventHandlers {
 export interface ControllerEventHandlers {
   createClickPrevHandler: (id: string) => () => void;
   createClickNextHandle: (id: string) => () => void;
-  createDragStartMoveHandle: (id: string) => () => void;
   createClickCopyHandle: (id: string) => () => void;
   createClickDeleteHandle: (id: string) => () => void;
 }
@@ -120,18 +119,6 @@ function Container() {
       console.log(`you clicked ${id}`);
     },
     createClickNextHandle: (id: string) => () => {},
-    createDragStartMoveHandle: (id: string) => () => {
-      console.log(`Drag start on controller`);
-      setEditingElements((elements) =>
-        elements.map((elem) => {
-          if (elem.id === id) {
-            elem.isDraggable = true;
-          }
-          return elem;
-        })
-      );
-      // 어떻게 진행해야 하려나 ?
-    },
     createClickCopyHandle: (id: string) => () => {},
     createClickDeleteHandle: (id: string) => () => {},
   };

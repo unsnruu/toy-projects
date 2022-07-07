@@ -36,17 +36,11 @@ function ElementController({
   id,
   contorllerEventHandlers,
 }: ElementControllerProps) {
-  const { createDragStartMoveHandle } = contorllerEventHandlers;
   return (
-    <Wrapper draggable="true">
+    <Wrapper>
       <Side style={{ left: 0 }}>
         <ControllerIcon>
-          <img
-            src={moveRoute}
-            alt="move"
-            draggable="false"
-            onDragStart={createDragStartMoveHandle(id)}
-          />
+          <img src={moveRoute} alt="move" draggable="false" />
         </ControllerIcon>
         <ControllerIcon
           onClick={contorllerEventHandlers.createClickPrevHandler(id)}
