@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 import { v4 as uuidv4 } from "uuid";
 
@@ -14,12 +14,12 @@ export interface EditingElement {
   id: string;
   isExpanded: boolean;
   isDraggable: boolean;
-  content: Options;
+  option: Options;
 }
 const initEditingElements: EditingElement[] = [
-  { id: uuidv4(), isExpanded: false, isDraggable: false, content: "button" },
-  { id: uuidv4(), isExpanded: false, isDraggable: false, content: "image" },
-  { id: uuidv4(), isExpanded: false, isDraggable: false, content: "text" },
+  { id: uuidv4(), isExpanded: false, isDraggable: false, option: "button" },
+  { id: uuidv4(), isExpanded: false, isDraggable: false, option: "image" },
+  { id: uuidv4(), isExpanded: false, isDraggable: false, option: "text" },
 ];
 
 export interface EditorElement {
@@ -47,63 +47,73 @@ export interface ControllerEventHandlers {
 
 function Container() {
   const [editingElements, setEditingElements] = useState(initEditingElements);
-  const [editorElements, setEditorElements] = useState(initEditorElements);
+  const editorElements = initEditorElements;
 
   const [selectedOption, setSelectedOption] = useState<Options>("button");
   const [selectedElement, setselectedElement] = useState<string | null>(null);
 
   const setOnlyElement = (id: string) => (value: boolean) => {
-    const newEditingElements = editingElements.map((elem) => {
-      if (elem.id === id) elem.isExpanded = value;
-      else elem.isExpanded = !value;
-      return elem;
+    setEditingElements((elements) => {
+      const newElements = elements.map((elem) => {
+        const newElement = { ...elem };
+        if (newElement.id === id) {
+          newElement.isExpanded = value;
+        } else {
+          newElement.isExpanded = !value;
+        }
+        return newElement;
+      });
+      return newElements;
     });
-    setEditingElements(newEditingElements);
   };
-  const setAllIsExpandedFalse = () => {
-    const newEditingElements = editingElements.map((elem) => {
-      elem.isExpanded = false;
-      return elem;
+  const setAllExpandedToFalse = () => {
+    setEditingElements((elements) => {
+      const newElements = elements.map((elem) => ({
+        ...elem,
+        isExpanded: false,
+      }));
+      return newElements;
     });
-    setEditingElements(newEditingElements);
   };
   const addEditingItemNextTo = (id: string) => {
-    const newEditingElements = [...editingElements];
-    const idx = newEditingElements.findIndex((elem) => elem.id === id);
+    setEditingElements((elements) => {
+      const newElements = elements.slice(0);
+      const idx = newElements.findIndex((elem) => elem.id === id);
 
-    if (idx < 0) return;
-    const newElement: EditingElement = {
-      id: uuidv4(),
-      isExpanded: false,
-      isDraggable: false,
-      content: selectedOption ? selectedOption : "text",
-    };
-    newEditingElements.splice(idx + 1, 0, newElement);
-
-    setEditingElements(newEditingElements);
+      if (idx >= 0) {
+        const newElement: EditingElement = {
+          id: uuidv4(),
+          isExpanded: false,
+          isDraggable: false,
+          option: selectedOption ? selectedOption : "text",
+        };
+        newElements.splice(idx + 1, 0, newElement);
+      }
+      return newElements;
+    });
   };
 
   //Event Handlers
-  const editorEvent = {
+  const editorEventHandlers = {
     createDragStartHandler: (option: Options) => () => {
       console.log(`drag start`);
       setSelectedOption(option);
     },
     handleDragEnd: () => {
       console.log("drag end");
-      setAllIsExpandedFalse();
+      setAllExpandedToFalse();
 
       if (selectedElement && selectedOption) {
         addEditingItemNextTo(selectedElement);
       }
 
-      setSelectedOption("button");
+      setSelectedOption("text");
     },
   };
   const editingEventHandlers: EditingEventHandlers = {
     handleDragEnterEditing: () => {
       console.log(`Drag entered in Editing`);
-      setAllIsExpandedFalse();
+      setAllExpandedToFalse();
       setselectedElement(null);
     },
     createDragEnterElement:
@@ -116,11 +126,34 @@ function Container() {
   };
   const controllerEventHandlers: ControllerEventHandlers = {
     createClickPrevHandler: (id: string) => () => {
-      console.log(`you clicked ${id}`);
+      const newElements = [...editingElements];
+      const idx = newElements.findIndex((elem) => elem.id === id);
+
+      //error
+      if (idx <= 0) return;
+      [newElements[idx], newElements[idx - 1]] = [
+        newElements[idx - 1],
+        newElements[idx],
+      ];
+      setEditingElements(newElements);
     },
-    createClickNextHandle: (id: string) => () => {},
+    createClickNextHandle: (id: string) => () => {
+      const newElements = [...editingElements];
+      const idx = newElements.findIndex((elem) => elem.id === id);
+
+      //error
+      if (idx === -1 || idx >= newElements.length - 1) return;
+      [newElements[idx], newElements[idx + 1]] = [
+        newElements[idx + 1],
+        newElements[idx],
+      ];
+      setEditingElements(newElements);
+    },
     createClickCopyHandle: (id: string) => () => {},
-    createClickDeleteHandle: (id: string) => () => {},
+    createClickDeleteHandle: (id: string) => () => {
+      const newElements = editingElements.filter((elem) => elem.id !== id);
+      setEditingElements(newElements);
+    },
   };
 
   return (
@@ -132,8 +165,8 @@ function Container() {
       />
       <Editor
         elements={editorElements}
-        createDragStartHandler={editorEvent.createDragStartHandler}
-        handleDragEnd={editorEvent.handleDragEnd}
+        createDragStartHandler={editorEventHandlers.createDragStartHandler}
+        handleDragEnd={editorEventHandlers.handleDragEnd}
       />
     </Wrapper>
   );
