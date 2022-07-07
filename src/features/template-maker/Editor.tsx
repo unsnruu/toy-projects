@@ -2,6 +2,8 @@ import styled from "@emotion/styled";
 import React from "react";
 
 import { EditorElement } from "./Container";
+import EditorIcons from "./EditorIcons";
+import { Options } from "./types";
 
 const Wrapper = styled.div`
   width: 30%;
@@ -10,7 +12,7 @@ const Wrapper = styled.div`
 
 interface EditorProps {
   elements: EditorElement[];
-  createDragStartHandler: (option: string) => () => void;
+  createDragStartHandler: (option: Options) => () => void;
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>) => void;
 }
 function Editor({
@@ -20,15 +22,14 @@ function Editor({
 }: EditorProps) {
   return (
     <Wrapper>
-      {elements.map((elem, idx) => (
-        <div
-          key={idx}
-          draggable="true"
-          onDragStart={createDragStartHandler(elem.option)}
-          onDragEnd={handleDragEnd}
-        >
-          {elem.option}
-        </div>
+      {elements.map(({ option, title }) => (
+        <EditorIcons
+          key={option}
+          option={option}
+          title={title}
+          handleDragStart={createDragStartHandler(option)}
+          handleDragEnd={handleDragEnd}
+        />
       ))}
     </Wrapper>
   );

@@ -1,37 +1,49 @@
 import styled from "@emotion/styled";
 import React from "react";
 
-import { EditingElement } from "./Container";
+import {
+  EditingElement,
+  EditingEventHandlers,
+  ControllerEventHandlers,
+} from "./Container";
 import EditingOuterElement from "./EditingOuterElement";
+import ElementController from "./ElementController";
 
 const EditingWrapper = styled.div`
   width: 70%;
-  border: 1px solid black;
+  height: 100vh;
+  overflow: scroll;
   padding: 1rem;
 `;
 
 interface EditingProps {
   elements: EditingElement[];
-  handleDragEnterEditing: () => void;
-  createDragEnterElementHandler: (
-    id: string
-  ) => (e: React.DragEvent<HTMLDivElement>) => void;
+  editingEventHandlers: EditingEventHandlers;
+  contorllerEventHandlers: ControllerEventHandlers;
 }
 
 function Editing({
   elements,
-  handleDragEnterEditing,
-  createDragEnterElementHandler,
+  editingEventHandlers,
+  contorllerEventHandlers,
 }: EditingProps) {
   return (
-    <EditingWrapper onDragEnter={handleDragEnterEditing}>
-      {elements.map(({ id, content, isExpanded }) => (
-        <EditingOuterElement
+    <EditingWrapper onDragEnter={editingEventHandlers.handleDragEnterEditing}>
+      {elements.map(({ id, content, isExpanded, isDraggable }) => (
+        <ElementController
           key={id}
-          content={content}
-          isExpanded={isExpanded}
-          handleDragEnterElement={createDragEnterElementHandler(id)}
-        />
+          id={id}
+          contorllerEventHandlers={contorllerEventHandlers}
+        >
+          <EditingOuterElement
+            content={content}
+            isExpanded={isExpanded}
+            isDraggble={isDraggable}
+            handleDragEnterElement={editingEventHandlers.createDragEnterElement(
+              id
+            )}
+          />
+        </ElementController>
       ))}
     </EditingWrapper>
   );

@@ -1,24 +1,28 @@
 import React from "react";
 import styled from "@emotion/styled";
 
+import { Options } from "./types";
 import EditingInnerElement from "./EditingInnterElement";
 
 const Wrapper = styled.div`
-  border: 1px solid black;
+  margin-bottom: 1rem;
+  width: 100%;
 `;
-//유저가 들어왔음을 어떻게 알 수 있는가?
+
 interface EditingOuterElementProps {
-  content: string;
+  content: Options;
   isExpanded: boolean;
+  isDraggble: boolean;
   handleDragEnterElement: (e: React.DragEvent<HTMLDivElement>) => void;
 }
 function EditingOuterElement({
-  isExpanded,
   content,
+  isExpanded,
+  isDraggble,
   handleDragEnterElement,
 }: EditingOuterElementProps) {
   return (
-    <Wrapper onDragEnter={handleDragEnterElement}>
+    <Wrapper onDragEnter={handleDragEnterElement} draggable={isDraggble}>
       <EditingInnerElement content={content} isExpanded={isExpanded} />
     </Wrapper>
   );

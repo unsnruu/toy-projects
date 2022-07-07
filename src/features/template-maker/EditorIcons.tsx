@@ -1,58 +1,79 @@
+// todo : HOC 만들어야해
+import React from "react";
 import styled from "@emotion/styled";
 
-import { EditableOption } from "./types";
+import text from "./icons/text.png";
+import img from "./icons/image.png";
+import button from "./icons/button.png";
+
+import { Options } from "./types";
 
 const Icons = styled.div`
-  margin: 1rem;
+  width: 100px;
+  height: 100px;
+  border: 1px solid black;
+  background-position: 50% 0;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
 `;
-const RectangleIcon = styled(Icons)`
-  width: 30px;
-  height: 30px;
-  background-color: black;
+const TextIcon = styled(Icons)`
+  background-image: url(${text});
 `;
-const TriangleIcon = styled(Icons)`
-  width: 0;
-  height: 0;
-  border-bottom: calc(15px * 1.73) solid black;
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent;
+const ImageIcon = styled(Icons)`
+  background-image: url(${img});
 `;
-const CircleIcon = styled(Icons)`
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: black;
+const ButtonIcon = styled(Icons)`
+  background-image: url(${button});
 `;
 
 interface EditorIconProps {
-  createDragStartHandler: (
-    selectable: EditableOption
-  ) => (e: React.DragEvent<HTMLDivElement>) => void;
+  option: Options;
+  title: string;
+  handleDragStart: () => void;
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>) => void;
 }
 function EditorIcons({
-  createDragStartHandler,
+  option,
+  title,
+  handleDragStart,
   handleDragEnd,
 }: EditorIconProps) {
-  return (
-    <div>
-      <RectangleIcon
-        draggable="true"
-        onDragStart={createDragStartHandler("rectangle")}
-        onDragEnd={handleDragEnd}
-      />
-      <TriangleIcon
-        draggable="true"
-        onDragStart={createDragStartHandler("triangle")}
-        onDragEnd={handleDragEnd}
-      />
-      <CircleIcon
-        draggable="true"
-        onDragStart={createDragStartHandler("circle")}
-        onDragEnd={handleDragEnd}
-      />
-    </div>
-  );
+  switch (option) {
+    case "button":
+      return (
+        <ButtonIcon
+          draggable="true"
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          {title}
+        </ButtonIcon>
+      );
+    case "image":
+      return (
+        <ImageIcon
+          draggable="true"
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          {title}
+        </ImageIcon>
+      );
+    case "text":
+      return (
+        <TextIcon
+          draggable="true"
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          {title}
+        </TextIcon>
+      );
+    case "divider":
+      return <div></div>;
+    default:
+      return null;
+  }
 }
 
 export default EditorIcons;
