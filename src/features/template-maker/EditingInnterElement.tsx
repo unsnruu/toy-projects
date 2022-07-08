@@ -4,7 +4,7 @@ import { Options } from "./types";
 
 interface EditingInnerElementProps {
   isExpanded: boolean;
-  content: Options;
+  option: Options;
 }
 const InnerElementWrapper = styled.div`
   width: 100%;
@@ -18,28 +18,24 @@ const CustomElementWrapper = styled.div`
   justify-content: center;
   padding: 1rem;
   width: 100%;
+  position: relative;
   &:hover {
     border: 1px dashed black;
   }
-  &:hover ::before {
-  }
 `;
-function EditingInnerElement({
-  isExpanded,
-  content,
-}: EditingInnerElementProps) {
+function EditingInnerElement({ isExpanded, option }: EditingInnerElementProps) {
   return (
     <InnerElementWrapper>
       <CustomElementWrapper>
-        <CustomElement content={content} />
+        <CustomElement option={option} />
       </CustomElementWrapper>
       {isExpanded ? <ExpandedElement /> : null}
     </InnerElementWrapper>
   );
 }
 
-function CustomElement({ content }: { content: Options }) {
-  switch (content) {
+function CustomElement({ option }: { option: Options }) {
+  switch (option) {
     case "button":
       return <ButtonElement />;
     case "image":

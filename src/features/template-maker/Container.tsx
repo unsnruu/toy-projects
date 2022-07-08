@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { v4 as uuidv4 } from "uuid";
 
@@ -37,6 +37,7 @@ export interface EditingEventHandlers {
   createDragEnterElement: (
     id: string
   ) => (e: React.DragEvent<HTMLDivElement>) => void;
+  handleDragEndElement: (id: string) => () => void;
 }
 export interface ControllerEventHandlers {
   createClickPrevHandler: (id: string) => () => void;
@@ -63,6 +64,7 @@ function Container() {
         }
         return newElement;
       });
+
       return newElements;
     });
   };
@@ -123,6 +125,25 @@ function Container() {
         setOnlyElement(id)(true);
         setselectedElement(id);
       },
+    handleDragEndElement: (id: string) => () => {
+      setAllExpandedToFalse();
+
+      setEditingElements((elements) => {
+        let newElements = elements.slice(0);
+        const current = newElements.find((elem) => elem.id === id);
+        const targetIdx = newElements.findIndex(
+          (elem) => elem.id === selectedElement
+        );
+
+        if (current && targetIdx >= 0) {
+          newElements = newElements.filter(
+            (elem) => elem.id !== id
+          ) as EditingElement[];
+          newElements.splice(targetIdx, 0, current);
+        }
+        return newElements;
+      });
+    },
   };
   const controllerEventHandlers: ControllerEventHandlers = {
     createClickPrevHandler: (id: string) => () => {

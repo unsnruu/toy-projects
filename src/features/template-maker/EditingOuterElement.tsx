@@ -3,27 +3,46 @@ import styled from "@emotion/styled";
 
 import { Options } from "./types";
 import EditingInnerElement from "./EditingInnterElement";
+import ElementController from "./ElementController";
+import { ControllerEventHandlers } from "./Container";
 
 const Wrapper = styled.div`
   margin-bottom: 1rem;
-  width: 100%;
+  width: 70%;
+  &:hover div {
+    opacity: 1;
+  }
 `;
 
 interface EditingOuterElementProps {
-  content: Options;
+  id: string;
+  option: Options;
   isExpanded: boolean;
   isDraggble: boolean;
   handleDragEnterElement: (e: React.DragEvent<HTMLDivElement>) => void;
+  contorllerEventHandlers: ControllerEventHandlers;
+  handleDragEndElement: (id: string) => () => void;
 }
 function EditingOuterElement({
-  content,
+  id,
+  option,
   isExpanded,
   isDraggble,
+  contorllerEventHandlers,
   handleDragEnterElement,
+  handleDragEndElement,
 }: EditingOuterElementProps) {
   return (
-    <Wrapper onDragEnter={handleDragEnterElement} draggable={isDraggble}>
-      <EditingInnerElement content={content} isExpanded={isExpanded} />
+    <Wrapper
+      onDragEnter={handleDragEnterElement}
+      draggable={true}
+      onDragEnd={handleDragEndElement(id)}
+    >
+      <ElementController
+        id={id}
+        contorllerEventHandlers={contorllerEventHandlers}
+      />
+      <EditingInnerElement option={option} isExpanded={isExpanded} />
     </Wrapper>
   );
 }

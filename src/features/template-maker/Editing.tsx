@@ -7,13 +7,16 @@ import {
   ControllerEventHandlers,
 } from "./Container";
 import EditingOuterElement from "./EditingOuterElement";
-import ElementController from "./ElementController";
 
 const EditingPaper = styled.div`
   width: 70%;
   height: 100vh;
   overflow: scroll;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
 `;
 
 interface EditingProps {
@@ -29,21 +32,19 @@ function Editing({
 }: EditingProps) {
   return (
     <EditingPaper onDragEnter={editingEventHandlers.handleDragEnterEditing}>
-      {elements.map(({ id, content, isExpanded, isDraggable }) => (
-        <ElementController
+      {elements.map(({ id, option, isExpanded, isDraggable }) => (
+        <EditingOuterElement
           key={id}
           id={id}
+          option={option}
+          isExpanded={isExpanded}
+          isDraggble={isDraggable}
           contorllerEventHandlers={contorllerEventHandlers}
-        >
-          <EditingOuterElement
-            content={content}
-            isExpanded={isExpanded}
-            isDraggble={isDraggable}
-            handleDragEnterElement={editingEventHandlers.createDragEnterElement(
-              id
-            )}
-          />
-        </ElementController>
+          handleDragEnterElement={editingEventHandlers.createDragEnterElement(
+            id
+          )}
+          handleDragEndElement={editingEventHandlers.handleDragEndElement}
+        />
       ))}
     </EditingPaper>
   );
