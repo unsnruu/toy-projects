@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import Editor from "./Editor";
 import Editing from "./Editing";
 import { Options } from "./types";
+import { swap } from "./utils";
 
 const Wrapper = styled.div`
   display: flex;
@@ -57,14 +58,10 @@ function Container() {
     setEditingElements((elements) => {
       const newElements = elements.map((elem) => {
         const newElement = { ...elem };
-        if (newElement.id === id) {
-          newElement.isExpanded = value;
-        } else {
-          newElement.isExpanded = !value;
-        }
+        newElement.isExpanded = newElement.id === id ? value : !value;
+
         return newElement;
       });
-
       return newElements;
     });
   };
@@ -98,30 +95,30 @@ function Container() {
   //Event Handlers
   const editorEventHandlers = {
     createDragStartHandler: (option: Options) => () => {
-      console.log(`drag start`);
       setSelectedOption(option);
     },
     handleDragEnd: () => {
-      console.log("drag end");
       setAllExpandedToFalse();
 
       if (selectedElement && selectedOption) {
         addEditingItemNextTo(selectedElement);
       }
-
       setSelectedOption("text");
     },
   };
   const editingEventHandlers: EditingEventHandlers = {
     handleDragEnterEditing: () => {
       console.log(`Drag entered in Editing`);
+
       setAllExpandedToFalse();
       setselectedElement(null);
     },
     createDragEnterElement:
       (id: string) => (e: React.DragEvent<HTMLDivElement>) => {
         console.log(`Drag entered in element ${id}`);
+
         e.stopPropagation();
+
         setOnlyElement(id)(true);
         setselectedElement(id);
       },
@@ -129,12 +126,13 @@ function Container() {
       setAllExpandedToFalse();
 
       setEditingElements((elements) => {
-        let newElements = elements.slice(0);
+        let newElements = [...elements];
         const current = newElements.find((elem) => elem.id === id);
         const targetIdx = newElements.findIndex(
           (elem) => elem.id === selectedElement
         );
-
+        //! 리팩토링 필요할 거 같은데
+        //끼워넣기?
         if (current && targetIdx >= 0) {
           newElements = newElements.filter(
             (elem) => elem.id !== id
@@ -150,24 +148,18 @@ function Container() {
       const newElements = [...editingElements];
       const idx = newElements.findIndex((elem) => elem.id === id);
 
-      //error
       if (idx <= 0) return;
-      [newElements[idx], newElements[idx - 1]] = [
-        newElements[idx - 1],
-        newElements[idx],
-      ];
+
+      swap(newElements, idx, idx - 1);
       setEditingElements(newElements);
     },
     createClickNextHandle: (id: string) => () => {
       const newElements = [...editingElements];
       const idx = newElements.findIndex((elem) => elem.id === id);
 
-      //error
       if (idx === -1 || idx >= newElements.length - 1) return;
-      [newElements[idx], newElements[idx + 1]] = [
-        newElements[idx + 1],
-        newElements[idx],
-      ];
+
+      swap(newElements, idx, idx + 1);
       setEditingElements(newElements);
     },
     createClickCopyHandle: (id: string) => () => {},

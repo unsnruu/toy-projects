@@ -2,7 +2,7 @@ import React from "react";
 import styled from "@emotion/styled";
 
 import { Options } from "./types";
-import EditingInnerElement from "./EditingInnterElement";
+import EditingInnerElement from "./EditingInnerElement";
 import ElementController from "./ElementController";
 import { ControllerEventHandlers } from "./Container";
 
