@@ -2,6 +2,10 @@
 
 이것 저것 실험적으로 만들어 놓은 작은 프로젝트를 정리하여 모아놓은 프로젝트 입니다.
 
+## 배포
+
+https://vercel.com/unsnruu/toy-projects/4QVJSbK5BLEehagqMuwBrnHSWcHp
+
 ## 토이프로젝트들
 
 1. template maker
